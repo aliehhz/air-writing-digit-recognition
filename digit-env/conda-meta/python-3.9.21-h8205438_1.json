@@ -4,12 +4,12 @@
   "channel": "https://repo.anaconda.com/pkgs/main/win-64",
   "constrains": [],
   "depends": [
-    "pip",
+    "openssl >=3.0.15,<4.0a0",
+    "sqlite >=3.45.3,<4.0a0",
     "tzdata",
     "vc >=14.2,<15.0a0",
     "vs2015_runtime >=14.29.30133,<15.0a0",
-    "openssl >=3.0.15,<4.0a0",
-    "sqlite >=3.45.3,<4.0a0"
+    "pip"
   ],
   "extracted_package_dir": "C:\\Users\\alieh\\anaconda3\\pkgs\\python-3.9.21-h8205438_1",
   "files": [
