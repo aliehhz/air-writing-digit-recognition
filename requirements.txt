@@ -5,6 +5,8 @@ flask
 mediapipe==0.10.21 
 protobuf==4.25.4
 opencv-python
+gunicorn
+
 
 
 #-e .
