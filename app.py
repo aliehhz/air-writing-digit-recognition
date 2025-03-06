@@ -92,8 +92,12 @@ def predict():
     canvas.fill(0)
 
     return jsonify({"digit": digit})
-
+'''
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Use PORT from Render, default to 5000 for local runs
+    app.run(host="0.0.0.0", port=port, debug=True)
+'''
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))  # Render assigns PORT dynamically
     app.run(host="0.0.0.0", port=port, debug=True)
