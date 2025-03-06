@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Writing Recognition</title>
+    
+    
+</head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .instructions {
+            max-width: 400px;
+            text-align: left;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        video {
+            width: 640px;
+            height: 480px;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Air Writing Recognition</h1>
+    
+    <div class="container">
+        <img src="{{ url_for('video_feed') }}" width="640" height="480">
+        
+        <div class="instructions">
+            <h3>How It Works</h3>
+            <p>1. Use your index finger to draw in the air.</p>
+            <p>2. Click <strong>Toggle Drawing</strong> to start drawing.</p>
+            <p>3. Click it again to stop drawing.</p>
+            <p>4. Click <strong>Recognize</strong> to predict the digit.</p>
+            <p>5. Click <strong>Clear Canvas</strong> to erase the screen.</p>
+        </div>
+    </div>
+    
+    <br>
+    
+    <button onclick="toggleDrawing()">Toggle Drawing</button>
+    <button onclick="clearCanvas()">Clear Canvas</button>
+    <button onclick="recognizeDigit()">Recognize</button>
+    
+    <h2 id="prediction">Predicted Digit: </h2>
+
+    <script>
+        let mediaStream = null;
+
+        // Start video feed
+        async function startVideo() {
+            try {
+                const videoElement = document.getElementById('videoFeed');
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = mediaStream;
+            } catch (error) {
+                console.error('Error accessing media devices.', error);
+            }
+        }
+
+        // Stop the video feed when the page is closed or navigated away
+        window.addEventListener('beforeunload', () => {
+            if (mediaStream) {
+                let tracks = mediaStream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+        });
+
+        // Start the video feed when the page loads
+        window.onload = startVideo;
+
+        // Function to recognize digit
+        function recognizeDigit() {
+            fetch('/predict', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('prediction').innerText = "Predicted Digit: " + data.digit;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Function to toggle drawing state
+        function toggleDrawing() {
+            fetch('/toggle_drawing', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to clear canvas
+        function clearCanvas() {
+            fetch('/clear_canvas', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
