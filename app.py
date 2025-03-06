@@ -1,15 +1,11 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow logs
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # Force CPU usage
 
 import cv2
 import numpy as np
 import mediapipe as mp
 from flask import Flask, render_template, Response, jsonify
 from src.pipeline.predict_pipeline import predict_digit  # Import ML model
-
-import matplotlib
-matplotlib.use('Agg') 
 
 app = Flask(__name__)
 
@@ -95,4 +91,4 @@ def predict():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Use PORT from Render, default to 5000 for local runs
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
