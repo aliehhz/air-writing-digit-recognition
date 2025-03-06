@@ -8,6 +8,9 @@ import mediapipe as mp
 from flask import Flask, render_template, Response, jsonify
 from src.pipeline.predict_pipeline import predict_digit  # Import ML model
 
+import matplotlib
+matplotlib.use('Agg') 
+
 app = Flask(__name__)
 
 # Initialize MediaPipe Hands
@@ -92,4 +95,5 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Use PORT from Render, default to 5000 for local runs
+    app.run(host="0.0.0.0", port=port, debug=True)
