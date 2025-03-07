@@ -3,15 +3,6 @@
 This project allows users to draw digits in the air using their index finger, and the system recognizes the drawn number using a deep learning model.
 
 
-## Live Demo in Render
-[Air-Writing-Digit-Recognition-App-in-Render](https://air-writing-digit-recognition.onrender.com)
-
-📌 Important Notes
-- The application is hosted on Render's free tier, which puts the server to sleep after a period of inactivity. As a result, it may take 1-2 minutes for the app to load initially.
-- Once the server is active, subsequent requests will load much faster.
-  
----
-
 ## Features
 - **Real-time hand tracking** using MediaPipe
 - **Air-writing on a virtual canvas**
