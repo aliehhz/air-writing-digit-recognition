@@ -1,4 +1,4 @@
-import os
+'''import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow logs
 
 import cv2
@@ -91,4 +91,78 @@ def predict():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Use PORT from Render, default to 5000 for local runs
+    app.run(host="0.0.0.0", port=port, debug=False)
+'''
+
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+import cv2
+import numpy as np
+import mediapipe as mp
+from flask import Flask, render_template, Response, jsonify, request
+from src.pipeline.predict_pipeline import predict_digit  # Import ML model
+
+app = Flask(__name__)
+
+# Initialize MediaPipe Hands
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7)
+
+# Create a blank canvas
+canvas = np.zeros((480, 640), dtype=np.uint8)
+drawing = False  # Toggle for drawing mode
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/toggle_drawing", methods=["POST"])
+def toggle_drawing():
+    global drawing
+    drawing = not drawing  # Toggle drawing mode
+    return "Drawing Mode: " + ("ON" if drawing else "OFF") 
+
+
+@app.route("/clear_canvas", methods=["POST"])
+def clear_canvas():
+    global canvas
+    canvas.fill(0)  # Clear the drawing
+    return "Canvas Cleared"
+
+
+@app.route("/process_frame", methods=["POST"])
+def process_frame():
+    global canvas, drawing
+
+    file = request.files['frame']
+    npimg = np.frombuffer(file.read(), np.uint8)
+    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+
+    h, w, _ = img.shape
+    rgb_frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    result = hands.process(rgb_frame)
+
+    if result.multi_hand_landmarks:
+        for hand_landmarks in result.multi_hand_landmarks:
+            index_finger_tip = hand_landmarks.landmark[8]  # Index finger tip
+            x, y = int(index_finger_tip.x * w), int(index_finger_tip.y * h)
+
+            if drawing:  # Draw only when mode is enabled
+                cv2.circle(canvas, (x, y), 8, 255, -1)
+
+    return "Frame Processed", 200
+
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    global canvas
+    digit = int(predict_digit(canvas))
+    canvas.fill(0)  # Clear after prediction
+    return jsonify({"digit": digit})
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
