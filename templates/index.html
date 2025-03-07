@@ -1,4 +1,4 @@
-<!--<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -119,93 +119,4 @@
     </script>
 </body>
 </html>
--->
 
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Writing Recognition</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .container { display: flex; justify-content: center; gap: 20px; }
-        video { width: 640px; height: 480px; }
-        canvas { border: 1px solid black; }
-    </style>
-</head>
-<body>
-    <h1>Air Writing Recognition</h1>
-
-    <div class="container">
-        <video id="video" autoplay></video>
-        <canvas id="canvas" width="640" height="480"></canvas>
-    </div>
-
-    <button id="toggle-drawing">Toggle Drawing</button>
-    <button id="recognize">Recognize</button>
-    <button id="clear-canvas">Clear Canvas</button>
-
-    <h2 id="prediction">Predicted Digit: </h2>
-
-    <script>
-        const videoElement = document.getElementById('video');
-        const canvasElement = document.getElementById('canvas');
-        const canvasContext = canvasElement.getContext('2d');
-        let drawing = false;
-
-        // Access user's webcam
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                videoElement.srcObject = stream;
-            })
-            .catch(err => {
-                console.log('Error accessing webcam:', err);
-            });
-
-        // Toggle drawing mode
-        document.getElementById('toggle-drawing').onclick = function() {
-            drawing = !drawing;
-        };
-
-        // Clear the canvas
-        document.getElementById('clear-canvas').onclick = function() {
-            canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        };
-
-        // Draw on canvas based on the mouse/finger input
-        videoElement.addEventListener('mousemove', (event) => {
-            if (drawing) {
-                const x = event.offsetX;
-                const y = event.offsetY;
-                canvasContext.beginPath();
-                canvasContext.arc(x, y, 10, 0, 2 * Math.PI);
-                canvasContext.fillStyle = 'red';
-                canvasContext.fill();
-            }
-        });
-
-        // Recognize the digit on the canvas
-        document.getElementById('recognize').onclick = function() {
-            canvasElement.toBlob(function(blob) {
-                const formData = new FormData();
-                formData.append('canvas', blob);
-                
-                fetch('/predict', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('prediction').innerText = "Predicted Digit: " + data.digit;
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                });
-            });
-        };
-    </script>
-</body>
-</html>
